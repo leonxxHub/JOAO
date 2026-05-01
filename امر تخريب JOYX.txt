@@ -1,0 +1,859 @@
+local Main = MakeTab({Name = "التــخريب ~ "})
+local section = AddSection(Main, {"قتل سفينة"})
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local playerNames = {}
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        table.insert(playerNames, plr.Name)
+    end
+end
+
+local selectedPlayerName = nil
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر لاعب",
+    Options = playerNames,
+    Default = playerNames[1],
+    Callback = function(Value)
+        selectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "قتل بالسفينه",
+    Callback = function()
+        if not selectedPlayerName then
+            warn("لم يتم اختيار لاعب")
+            return
+        end
+
+        MakeNotifi({
+            Title = "تم التشغيل",
+            Text = "لا تفعل الامر اكثر من مرا",
+            Time = 5
+        })
+
+        local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+            local originalPosition = humanoidRootPart.Position
+            local originalAnchoredState = humanoidRootPart.Anchored
+
+            humanoidRootPart.CFrame = CFrame.new(634.18, -4.00, 1839.65)
+            wait(0.5)
+
+            local args = {
+                "PickingBoat",
+                "MilitaryBoatFree"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(args))
+            wait(1.5)
+
+            local function sitInBoat()
+                local vehicle = workspace.Vehicles:FindFirstChild(LocalPlayer.Name .. "Car")
+                if not vehicle then return end
+
+                local vehicleSeat = vehicle.Body:FindFirstChild("VehicleSeat")
+                if not vehicleSeat then return end
+
+                humanoidRootPart.Anchored = false
+                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                wait(0.2)
+
+                humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.5, 0)
+                wait(0.2)
+
+                humanoid.Sit = true
+                firetouchinterest(humanoidRootPart, vehicleSeat, 0)
+                firetouchinterest(humanoidRootPart, vehicleSeat, 1)
+                wait(0.5)
+
+                if humanoid.SeatPart ~= vehicleSeat then
+                    humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.5, 0)
+                    humanoid.Sit = true
+                    wait(0.5)
+                end
+            end
+
+            sitInBoat()
+            wait(0.5)
+
+            local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
+            local vehicle = workspace.Vehicles:FindFirstChild(LocalPlayer.Name .. "Car")
+
+            if vehicle then
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0)))
+                humanoidRootPart.CFrame = CFrame.new(targetPosition + Vector3.new(0, 5, 0))
+
+                local crazyStart = tick()
+                while tick() - crazyStart < 2 do
+                    local offset = Vector3.new(
+                        math.random(-25, 12),
+                        math.random(-13, 10),
+                        math.random(-10, 18)
+                    )
+                    vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0) + offset))
+                    wait(0.05)
+                end
+            end
+
+            local targetDestination = Vector3.new(-86.00, -224.27, 34.57)
+            if vehicle then
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetDestination))
+                humanoidRootPart.CFrame = CFrame.new(targetDestination + Vector3.new(0, 5, 0))
+            end
+
+            wait(1)
+            humanoidRootPart.Anchored = false
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+            if vehicle then
+                vehicle:Destroy()
+            end
+
+            wait(0.5)
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+            humanoidRootPart.Anchored = originalAnchoredState
+            humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+
+            local finalArgs = {
+                [1] = "PickingBoat",
+                [2] = "MilitaryBoatFree"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(finalArgs))
+
+            wait(0.5)
+            local deleteArgs = {
+                [1] = "DeleteAllVehicles"
+            }
+            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Ca1r"):FireServer(unpack(deleteArgs))
+        else
+            warn("اللاعب غير موجود أو لا يملك الشخصية")
+        end
+    end
+})
+local section = AddSection(Main, {"قتل باص"})
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local SelectedPlayerName = nil
+
+local playerNames = {}
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        table.insert(playerNames, player.Name)
+    end
+end
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر لاعب",
+    Options = playerNames,
+    Default = playerNames[1] or "",
+    Callback = function(Value)
+        SelectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "قتل بالباص",
+    Callback = function()
+        if not SelectedPlayerName then
+            warn("اختر لاعبًا أولًا")
+            return
+        end
+
+        local player = LocalPlayer
+        local targetPlayer = Players:FindFirstChild(SelectedPlayerName)
+        if not (targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+            warn("اللاعب غير موجود أو لم يُحمّل")
+            return
+        end
+
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+        local originalPosition = humanoidRootPart.Position
+        local originalAnchoredState = humanoidRootPart.Anchored
+
+        humanoidRootPart.CFrame = CFrame.new(1082.86, 76.00, -1125.20)
+        wait(0.3)
+
+        local spawnArgs = {
+            [1] = "PickingCar",
+            [2] = "SchoolBus"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(spawnArgs))
+        wait(3.5)
+
+        local function sitInBus()
+            local vehicleName = player.Name .. "Car"
+            local vehicle = workspace.Vehicles:FindFirstChild(vehicleName)
+            if not vehicle then return false end
+
+            local vehicleSeat = vehicle.Body:FindFirstChild("VehicleSeat")
+            if not vehicleSeat then return false end
+
+            humanoidRootPart.Anchored = false
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+            humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.3, 0)
+            wait(0.15)
+
+            humanoid.Sit = true
+            firetouchinterest(humanoidRootPart, vehicleSeat, 0)
+            firetouchinterest(humanoidRootPart, vehicleSeat, 1)
+            wait(0.3)
+
+            if humanoid.SeatPart ~= vehicleSeat then
+                humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.3, 0)
+                humanoid.Sit = true
+                wait(0.3)
+            end
+
+            return humanoid.SeatPart == vehicleSeat
+        end
+
+        if not sitInBus() then return end
+
+        local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
+        local vehicleName = player.Name .. "Car"
+        local vehicle = workspace.Vehicles:FindFirstChild(vehicleName)
+
+        if vehicle then
+            local crazyStart = tick()
+            while tick() - crazyStart < 2.5 do
+                local offset = Vector3.new(
+                    math.random(-25, 12),
+                        math.random(-13, 10),
+                        math.random(-10, 18)
+                )
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0) + offset))
+                wait(0.04)
+            end
+        end
+
+        local targetDestination = Vector3.new(-86.00, -224.27, 34.57)
+        if vehicle then
+            vehicle:SetPrimaryPartCFrame(CFrame.new(targetDestination))
+            humanoidRootPart.CFrame = CFrame.new(targetDestination + Vector3.new(0, 3, 0))
+        end
+
+        wait(0.3)
+        humanoidRootPart.Anchored = false
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+        local deleteArgs = {
+            [1] = "DeleteAllVehicles"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(deleteArgs))
+
+        wait(0.2)
+        humanoidRootPart.CFrame = CFrame.new(originalPosition)
+        humanoidRootPart.Anchored = originalAnchoredState
+        humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+    end
+})
+local section = AddSection(Main, {"سحب باص"})
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local SelectedPlayerName = nil
+
+local playerNames = {}
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        table.insert(playerNames, player.Name)
+    end
+end
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر لاعب",
+    Options = playerNames,
+    Default = playerNames[1] or "",
+    Callback = function(Value)
+        SelectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "سحب بالباص",
+    Callback = function()
+        if not SelectedPlayerName then
+            warn("اختر لاعبًا أولًا")
+            return
+        end
+
+        local player = LocalPlayer
+        local targetPlayer = Players:FindFirstChild(SelectedPlayerName)
+        if not (targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+            warn("اللاعب غير موجود أو لم يُحمّل")
+            return
+        end
+
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+        local originalPosition = humanoidRootPart.Position
+        local originalAnchoredState = humanoidRootPart.Anchored
+
+        humanoidRootPart.CFrame = CFrame.new(1082.86, 76.00, -1125.20)
+        wait(0.3)
+
+        local spawnArgs = {
+            [1] = "PickingCar",
+            [2] = "SchoolBus"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(spawnArgs))
+        wait(3.5)
+
+        local function sitInBus()
+            local vehicleName = player.Name .. "Car"
+            local vehicle = workspace.Vehicles:FindFirstChild(vehicleName)
+            if not vehicle then return false end
+
+            local vehicleSeat = vehicle.Body:FindFirstChild("VehicleSeat")
+            if not vehicleSeat then return false end
+
+            humanoidRootPart.Anchored = false
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+            humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.3, 0)
+            wait(0.15)
+
+            humanoid.Sit = true
+            firetouchinterest(humanoidRootPart, vehicleSeat, 0)
+            firetouchinterest(humanoidRootPart, vehicleSeat, 1)
+            wait(0.3)
+
+            if humanoid.SeatPart ~= vehicleSeat then
+                humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.3, 0)
+                humanoid.Sit = true
+                wait(0.3)
+            end
+
+            return humanoid.SeatPart == vehicleSeat
+        end
+
+        if not sitInBus() then return end
+
+        local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
+        local vehicleName = player.Name .. "Car"
+        local vehicle = workspace.Vehicles:FindFirstChild(vehicleName)
+
+        if vehicle then
+            local crazyStart = tick()
+            while tick() - crazyStart < 2.5 do
+                local offset = Vector3.new(
+                    math.random(-25, 12),
+                        math.random(-13, 10),
+                        math.random(-10, 18)
+                )
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0) + offset))
+                wait(0.04)
+            end
+        end
+
+        if vehicle then
+            vehicle:SetPrimaryPartCFrame(CFrame.new(originalPosition))
+            humanoidRootPart.CFrame = CFrame.new(originalPosition + Vector3.new(0, 3, 0))
+        end
+
+        wait(0.3)
+        humanoidRootPart.Anchored = false
+        humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+        local deleteArgs = {
+            [1] = "DeleteAllVehicles"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(deleteArgs))
+
+        wait(0.2)
+        humanoidRootPart.CFrame = CFrame.new(originalPosition)
+        humanoidRootPart.Anchored = originalAnchoredState
+        humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+    end
+})
+local section = AddSection(Main, {"قتل بالسفينة الجبيرة"})
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local playerNames = {}
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        table.insert(playerNames, plr.Name)
+    end
+end
+
+local selectedPlayerName = nil
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر لاعب",
+    Options = playerNames,
+    Default = playerNames[1],
+    Callback = function(Value)
+        selectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "قتل بالسفينه الكبيره",
+    Callback = function()
+        if not selectedPlayerName then
+            warn("لم يتم اختيار لاعب")
+            return
+        end
+
+        MakeNotifi({
+            Title = "تم التشغيل",
+            Text = "لا تفعله اكثر من مرا",
+            Time = 5
+        })
+
+        local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local humanoid = character:WaitForChild("Humanoid")
+            local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+            local originalPosition = humanoidRootPart.Position
+            local originalAnchoredState = humanoidRootPart.Anchored
+
+            humanoidRootPart.CFrame = CFrame.new(634.18, -4.00, 1839.65)
+            wait(0.5)
+
+            local args = {
+                "PickingBoat",
+                "PirateFree"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(args))
+            wait(1.5)
+
+            local function sitInBoat()
+                local vehicleSeat = workspace.Vehicles:FindFirstChild("doctonbcCar")
+                if not vehicleSeat then return end
+
+                vehicleSeat = vehicleSeat.Body:FindFirstChild("VehicleSeat")
+                if not vehicleSeat then return end
+
+                humanoidRootPart.Anchored = false
+                humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                wait(0.2)
+
+                humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.5, 0)
+                wait(0.2)
+
+                humanoid.Sit = true
+                firetouchinterest(humanoidRootPart, vehicleSeat, 0)
+                firetouchinterest(humanoidRootPart, vehicleSeat, 1)
+                wait(0.5)
+
+                if humanoid.SeatPart ~= vehicleSeat then
+                    humanoidRootPart.CFrame = vehicleSeat.CFrame * CFrame.new(0, 0.5, 0)
+                    humanoid.Sit = true
+                    wait(0.5)
+                end
+            end
+
+            sitInBoat()
+            wait(0.5)
+
+            local targetPosition = targetPlayer.Character.HumanoidRootPart.Position
+            local vehicle = workspace.Vehicles:FindFirstChild(LocalPlayer.Name .. "Car")
+
+            if vehicle then
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0)))
+                humanoidRootPart.CFrame = CFrame.new(targetPosition + Vector3.new(0, 5, 0))
+
+                local crazyStart = tick()
+                while tick() - crazyStart < 2 do
+                    local offset = Vector3.new(
+                        math.random(-25, 12),
+                        math.random(-13, 10),
+                        math.random(-10, 18)
+                    )
+                    vehicle:SetPrimaryPartCFrame(CFrame.new(targetPosition + Vector3.new(0, -2, 0) + offset))
+                    wait(0.05)
+                end
+            end
+
+            local targetDestination = Vector3.new(-86.00, -224.27, 34.57)
+            if vehicle then
+                vehicle:SetPrimaryPartCFrame(CFrame.new(targetDestination))
+                humanoidRootPart.CFrame = CFrame.new(targetDestination + Vector3.new(0, 5, 0))
+            end
+
+            wait(0.5)
+            humanoidRootPart.Anchored = false
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+
+            if vehicle then
+                vehicle:Destroy()
+            end
+
+            wait(0.5)
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+            humanoidRootPart.Anchored = originalAnchoredState
+            humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+
+            local finalArgs = {
+                [1] = "PickingBoat",
+                [2] = "PirateFree"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1Ca1r"):FireServer(unpack(finalArgs))
+
+            wait(0.5)
+            local deleteArgs = {
+                [1] = "DeleteAllVehicles"
+            }
+            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Ca1r"):FireServer(unpack(deleteArgs))
+        else
+            warn("اللاعب غير موجود أو لا يملك الشخصية")
+        end
+    end
+})
+local section = AddSection(Main, {"قتل اللاعب بالقنفة"})
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local backpack = player:WaitForChild("Backpack")
+
+local selectedPlayerName = nil
+
+local function getPlayersNames()
+    local names = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= player then
+            table.insert(names, p.Name)
+        end
+    end
+    return names
+end
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختار الاعب",
+    Options = getPlayersNames(),
+    Default = "",
+    Callback = function(Value)
+        selectedPlayerName = Value
+    end
+})
+
+local StartButton = AddButton(Main, {
+    Name = "قتل الاعب بالكنب",
+    Callback = function()
+        if not selectedPlayerName then
+            warn("لم يتم اختيار لاعب!")
+            return
+        end
+        
+        local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+        if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            warn("اللاعب غير موجود أو شخصيته غير جاهزة")
+            return
+        end
+
+        local args = {
+            [1] = "PickingTools",
+            [2] = "Couch"
+        }
+        ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Too1l"):InvokeServer(unpack(args))
+        task.wait(0.5)
+
+        local tool = backpack:FindFirstChildOfClass("Tool")
+        if tool then
+            tool.Parent = character
+        end
+
+        local originalCFrame = humanoidRootPart.CFrame
+
+        humanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(2, 0, 2)
+
+        task.wait(0.2)
+
+        local connection
+        connection = RunService.Heartbeat:Connect(function()
+            if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local targetPos = targetPlayer.Character.HumanoidRootPart.Position
+                local offset = Vector3.new(
+                    math.random(-5,5),
+                    math.random(-2,2),
+                    math.random(-5,5)
+                )
+                humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, targetPos + offset)
+                humanoidRootPart.Velocity = (targetPos - humanoidRootPart.Position).Unit * 100
+            end
+        end)
+
+        task.delay(2, function()
+            connection:Disconnect()
+
+            humanoidRootPart.CFrame = CFrame.new(Vector3.new(-86, -224.27, 34.57))
+
+            task.wait(1)
+
+            humanoidRootPart.CFrame = originalCFrame
+
+            task.wait(0.1)
+
+            local deleteArgs = {
+                [1] = "PlayerWantsToDeleteTool",
+                [2] = "Couch"
+            }
+            ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Clea1rTool1s"):FireServer(unpack(deleteArgs))
+        end)
+    end
+})
+local section = AddSection(Main, {"قتل بالكرسي"})
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local backpack = localPlayer:WaitForChild("Backpack")
+
+local fixedPosition = Vector3.new(-86.00, -224.27, 34.57)
+local returnPosition = humanoidRootPart.Position
+
+local selectedPlayerName
+
+local function removeTool()
+    for _, item in pairs(character:GetChildren()) do
+        if item:IsA("Tool") then
+            item.Parent = backpack
+        end
+    end
+end
+
+local function teleportTo(position)
+    humanoidRootPart.CFrame = CFrame.new(position)
+end
+
+local function resetScript()
+    character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    backpack = localPlayer:WaitForChild("Backpack")
+    returnPosition = humanoidRootPart.Position
+end
+
+local function deleteToolAfterServer()
+    local tool = character:FindFirstChild("Stretcher")
+    if tool then
+        local args = {
+            [1] = "PlayerWantsToDeleteTool",
+            [2] = "Stretcher"
+        }
+        ReplicatedStorage.RE:FindFirstChild("1Clea1rTool1s"):FireServer(unpack(args))
+
+        repeat
+            task.wait(0.1)
+        until not character:FindFirstChild("Stretcher")
+
+        print("تم حذف الأداة تلقائيًا")
+    end
+end
+
+local function followPlayer(targetPlayer)
+    local targetChar = targetPlayer.Character
+    if not targetChar then return end
+
+    local targetHRP = targetChar:FindFirstChild("HumanoidRootPart")
+    if not targetHRP then return end
+
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        if not targetChar or not targetChar.Parent or not targetHRP then
+            connection:Disconnect()
+            teleportTo(fixedPosition)
+            task.wait(0.5)
+            deleteToolAfterServer()
+            teleportTo(returnPosition)
+            return
+        end
+
+        local targetHumanoid = targetChar:FindFirstChild("Humanoid")
+        if targetHumanoid and targetHumanoid.Sit then
+            connection:Disconnect()
+            teleportTo(fixedPosition)
+            task.wait(0.5)
+            deleteToolAfterServer()
+            teleportTo(returnPosition)
+            return
+        end
+
+        humanoidRootPart.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+    end)
+end
+
+local function pickToolAndFollow(targetPlayer)
+    local args = {
+        [1] = "PickingTools",
+        [2] = "Stretcher"
+    }
+    ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Too1l"):InvokeServer(unpack(args))
+
+    local tool
+    repeat
+        task.wait(0.1)
+        tool = backpack:FindFirstChild("Stretcher")
+    until tool
+
+    tool.Parent = character
+
+    followPlayer(targetPlayer)
+end
+
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            table.insert(playerNames, player.Name)
+        end
+    end
+    return playerNames
+end
+
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر اللاعب",
+    Options = getPlayerNames(),
+    Default = "",
+    Callback = function(Value)
+        selectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "قتل بالكرسي",
+    Callback = function()
+        if selectedPlayerName then
+            local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer then
+                resetScript()
+                pickToolAndFollow(targetPlayer)
+            else
+                warn("اللاعب مو موجود!")
+            end
+        else
+            warn("اختار لاعب اول!")
+        end
+    end
+})
+
+localPlayer.CharacterAdded:Connect(resetScript)
+local section = AddSection(Main, {"=========="})
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local backpack = localPlayer:WaitForChild("Backpack")
+
+local function deleteToolAfterServer()
+    local tool = character:FindFirstChild("Stretcher")
+    if tool then
+        local args = {
+            [1] = "PlayerWantsToDeleteTool",
+            [2] = "Stretcher"
+        }
+        ReplicatedStorage.RE:FindFirstChild("1Clea1rTool1s"):FireServer(unpack(args))
+
+        repeat
+            task.wait(0.1)
+        until not character:FindFirstChild("Stretcher")
+    end
+end
+
+local function pickTool()
+    local args = {
+        [1] = "PickingTools",
+        [2] = "Stretcher"
+    }
+    ReplicatedStorage:WaitForChild("RE"):WaitForChild("1Too1l"):InvokeServer(unpack(args))
+
+    local tool
+    repeat
+        task.wait(0.1)
+        tool = backpack:FindFirstChild("Stretcher")
+    until tool
+
+    tool.Parent = character
+end
+
+local function followPlayer(targetPlayer)
+    local targetChar = targetPlayer.Character
+    if not targetChar then return end
+
+    local targetHRP = targetChar:FindFirstChild("HumanoidRootPart")
+    if not targetHRP then return end
+
+    local originalPosition = humanoidRootPart.Position
+    local connection
+
+    connection = RunService.Heartbeat:Connect(function()
+        if not targetChar or not targetChar.Parent or not targetHRP then
+            connection:Disconnect()
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+            deleteToolAfterServer()
+            return
+        end
+
+        local targetHumanoid = targetChar:FindFirstChild("Humanoid")
+        if targetHumanoid and targetHumanoid.Sit then
+            connection:Disconnect()
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+            deleteToolAfterServer()
+            return
+        end
+
+        humanoidRootPart.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+    end)
+end
+
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            table.insert(playerNames, player.Name)
+        end
+    end
+    return playerNames
+end
+
+local selectedPlayerName
+local Dropdown = AddDropdown(Main, {
+    Name = "اختر اللاعب",
+    Options = getPlayerNames(),
+    Default = "",
+    Callback = function(Value)
+        selectedPlayerName = Value
+    end
+})
+
+AddButton(Main, {
+    Name = "سحب بالكرسي",
+    Callback = function()
+        if selectedPlayerName then
+            local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer then
+                pickTool()
+                followPlayer(targetPlayer)
+            else
+                warn("اللاعب مو موجود!")
+            end
+        else
+            warn("اختار لاعب اول!")
+        end
+    end
+})
